@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1723793544028-1.2.1" author="jason.zhuang" dbms="postgresql" runOnChange="true">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*)
+                FROM information_schema.tables
+                WHERE table_name = 'comments';
+            </sqlCheck>
+        </preConditions>
+
+        <createTable schemaName="spring" tableName="comments">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="pk_articles" nullable="false"/>
+            </column>
+            <column name="article_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT"/>
+            <column name="author" type="varchar(255)"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="1723793544028-1.2.2" author="jason.zhuang" dbms="postgresql" runOnChange="true">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'articles';
+                </sqlCheck>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'comments';
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <addForeignKeyConstraint baseTableName="comments"
+                                 baseColumnNames="article_id"
+                                 constraintName="fk_comments_articles_id"
+                                 deferrable="true"
+                                 initiallyDeferred="true"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedTableName="articles"
+                                 referencedColumnNames="id"
+                                 validate="true"/>
+    </changeSet>
+
+    <changeSet id="1723793544028-1.2.3" author="jason.zhuang" dbms="postgresql" runOnChange="true">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM articles WHERE id = 1;
+                </sqlCheck>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'comments';
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <sql>
+            select current_date + current_time;
+        </sql>
+        <insert schemaName="spring" tableName="comments">
+            <column name="article_id" value="1"/>
+            <column name="content" value="Great article!"/>
+            <column name="author" value="Alice"/>
+            <column name="created_at" value="${now}"/>
+        </insert>
+        <insert schemaName="spring" tableName="comments">
+            <column name="article_id" value="1"/>
+            <column name="content" value="Rubbish article!"/>
+            <column name="author" value="Bob"/>
+            <column name="created_at" value="${now}"/>
+        </insert>
+        <sql>
+            INSERT INTO comments (article_id, content, author, created_at)
+            VALUES
+                (1, 'Great article! The future of AI looks very promising.', 'Alice Williams', '2024-08-01 11:00:00'),
+                (1, 'I’m excited about the potential of AI in healthcare.', 'Bob Johnson', '2024-08-01 12:15:00'),
+                (1, 'The discussion on machine learning is very insightful.', 'Charlie Brown', '2024-08-01 13:45:00'),
+                (1, 'I’m concerned about the ethical implications of AI.', 'Diana Smith', '2024-08-01 15:00:00'),
+                (1, 'Looking forward to seeing these advancements in action.', 'Eve Davis', '2024-08-01 16:20:00'),
+                (1, 'Interesting read. What about the impact on jobs?', 'Frank Miller', '2024-08-01 17:35:00'),
+                (1, 'Could you provide more examples of AI applications?', 'Grace Wilson', '2024-08-01 18:50:00'),
+                (1, 'This article covers some exciting possibilities.', 'Hank Moore', '2024-08-01 20:05:00'),
+                (1, 'The potential of AI in education is fascinating.', 'Ivy Lee', '2024-08-01 21:30:00'),
+                (1, 'Excellent overview of future AI technologies.', 'Jack Anderson', '2024-08-01 22:45:00');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
