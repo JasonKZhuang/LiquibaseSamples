@@ -1,6 +1,10 @@
 #################### Sensitive File ####################
 application.yaml
 **/application.yaml
+liquibase.properties
+**/liquibase.properties
+*.properties
+**/*.properties
 .env
 **/.env
 .env.*
